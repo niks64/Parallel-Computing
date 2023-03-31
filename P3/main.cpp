@@ -5,6 +5,7 @@
 
 Timer timerLaplacian;
 Timer timerSaxpy;
+Timer timerInner;
 
 int main(int argc, char *argv[])
 {
@@ -31,14 +32,20 @@ int main(int argc, char *argv[])
         InitializeProblem(x, f);
         matrix = BuildLaplacianMatrix(); // This takes a while ...
         timer.Stop("Initialization : ");
+        timer.Restart();
     }
 
     // Call Conjugate Gradients algorithm
     {	
-        timerLaplacian.Reset(); timerSaxpy.Reset();
+        Timer timer;
+        timerLaplacian.Reset(); timerSaxpy.Reset(); timerInner.Reset();
+        timer.Start();
         ConjugateGradients(matrix, x, f, p, r, z, false);
+        timer.Pause();
         timerLaplacian.Print("Total Laplacian Time : ");
         timerSaxpy.Print("Total Saxpy Time : ");
+        timerInner.Print("Total InnerProduct Time : ");
+        timer.Print("Total Conjugate Gradients Time : ");
     }
 
     return 0;

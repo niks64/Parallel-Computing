@@ -9,6 +9,7 @@
 
 extern Timer timerLaplacian;
 extern Timer timerSaxpy;
+extern Timer timerInner;
 
 void ConjugateGradients(
     CSRMatrix& matrix,
@@ -29,16 +30,16 @@ void ConjugateGradients(
         
     // Algorithm : Line 4
     Copy(r, p);
-    float rho=InnerProduct(p, r);
+    timerInner.Restart(); float rho=InnerProduct(p, r); timerInner.Pause();
         
     // Beginning of loop from Line 5
     for(int k=0;;k++)
     {
-        std::cout << "Residual norm (nu) after " << k << " iterations = " << nu << std::endl;
+        //std::cout << "Residual norm (nu) after " << k << " iterations = " << nu << std::endl;
 
         // Algorithm : Line 6
         timerLaplacian.Restart(); ComputeLaplacian(matrix, p, z); timerLaplacian.Pause();
-        float sigma=InnerProduct(p, z);
+        timerInner.Restart(); float sigma=InnerProduct(p, z); timerInner.Pause();
 
         // Algorithm : Line 7
         float alpha=rho/sigma;
@@ -57,7 +58,7 @@ void ConjugateGradients(
             
         // Algorithm : Line 13
         Copy(r, z);
-        float rho_new = InnerProduct(z, r);
+        timerInner.Restart(); float rho_new = InnerProduct(z, r); timerInner.Pause();
 
         // Algorithm : Line 14
         float beta = rho_new/rho;
