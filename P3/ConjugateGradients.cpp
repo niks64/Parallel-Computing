@@ -7,9 +7,7 @@
 
 #include <iostream>
 
-extern Timer timerLaplacian;
-extern Timer timerSaxpy;
-extern Timer timerInner;
+extern Timer timerLaplacian, timerSaxpy, timerInner, timerNorm, timerCopy, timerSaxpyV1, timerSaxpyV2, timerSaxpyV3;
 
 void ConjugateGradients(
     CSRMatrix& matrix,
@@ -22,14 +20,14 @@ void ConjugateGradients(
 {
     // Algorithm : Line 2
     timerLaplacian.Restart(); ComputeLaplacian(matrix, x, z); timerLaplacian.Pause();
-    Saxpy(z, f, r, -1);
-    float nu = Norm(r);
+    timerSaxpyV1.Restart(); Saxpy(z, f, r, -1); timerSaxpyV1.Pause(); // version 1
+    timerNorm.Restart(); float nu = Norm(r); timerNorm.Pause();
 
     // Algorithm : Line 3
     if (nu < nuMax) return;
         
     // Algorithm : Line 4
-    Copy(r, p);
+    timerCopy.Restart(); Copy(r, p); timerCopy.Pause();
     timerInner.Restart(); float rho=InnerProduct(p, r); timerInner.Pause();
         
     // Beginning of loop from Line 5
@@ -45,19 +43,19 @@ void ConjugateGradients(
         float alpha=rho/sigma;
 
         // Algorithm : Line 8
-        Saxpy(z, r, r, -alpha);
-        nu=Norm(r);
+        timerSaxpyV2.Restart(); Saxpy(z, r, -alpha); timerSaxpyV2.Pause(); // version 2
+        timerNorm.Restart(); nu=Norm(r); timerNorm.Pause();
 
         // Algorithm : Lines 9-12
         if (nu < nuMax || k == kMax) {
-            Saxpy(p, x, x, alpha);
+            timerSaxpyV2.Restart(); Saxpy(p, x, alpha); timerSaxpyV2.Pause(); // version 2
             std::cout << "Conjugate Gradients terminated after " << k << " iterations; residual norm (nu) = " << nu << std::endl;
             if (writeIterations) WriteAsImage("x", x, k, 0, 127);
             return;
         }
             
         // Algorithm : Line 13
-        Copy(r, z);
+        timerCopy.Restart(); Copy(r, z); timerCopy.Pause();
         timerInner.Restart(); float rho_new = InnerProduct(z, r); timerInner.Pause();
 
         // Algorithm : Line 14
@@ -67,13 +65,13 @@ void ConjugateGradients(
         rho=rho_new;
 
         // Algorithm : Line 16
-        timerSaxpy.Restart(); Saxpy(p, x, alpha); timerSaxpy.Pause(); 
+        timerSaxpyV2.Restart(); Saxpy(p, x, alpha); timerSaxpyV2.Pause(); // version 2
         // Note: this used to be 
         // Saxpy(p, x, x, alpha);
         // The version above uses the fact that the destination vector is the same
         // as the second input vector -- i.e. Saxpy(x, y, c) performs
         // the operation y += c * x
-        Saxpy(p, r, p, beta);
+        timerSaxpyV3.Restart(); SaxpyV3(r, p, beta); timerSaxpyV3.Pause();// version 1
 
         if (writeIterations) WriteAsImage("x", x, k, 0, 127);
     }

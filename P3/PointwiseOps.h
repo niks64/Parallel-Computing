@@ -12,3 +12,6 @@ void Saxpy(const float (&x)[XDIM][YDIM][ZDIM], const float (&y)[XDIM][YDIM][ZDIM
 // Scale array x by given number, add y, and write result into y (specialization of call above)
 void Saxpy(const float (&x)[XDIM][YDIM][ZDIM], float (&y)[XDIM][YDIM][ZDIM],
     const float scale);
+
+void SaxpyV3(const float (&x)[XDIM][YDIM][ZDIM], float (&y)[XDIM][YDIM][ZDIM],
+    const float scale);

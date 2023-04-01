@@ -2,10 +2,13 @@
 #include "Laplacian.h"
 #include "Timer.h"
 #include "Utilities.h"
+// Added includes
+#include <iostream>
+#include "PointwiseOps.h"
+#include "Reductions.h"
 
-Timer timerLaplacian;
-Timer timerSaxpy;
-Timer timerInner;
+Timer timerLaplacian, timerSaxpy, timerInner, timerNorm, timerCopy, timerSaxpyV1, timerSaxpyV2, timerSaxpyV3;
+
 
 int main(int argc, char *argv[])
 {
@@ -35,18 +38,24 @@ int main(int argc, char *argv[])
         timer.Restart();
     }
 
+    
     // Call Conjugate Gradients algorithm
     {	
         Timer timer;
-        timerLaplacian.Reset(); timerSaxpy.Reset(); timerInner.Reset();
+        timerLaplacian.Reset(); timerSaxpy.Reset(); timerInner.Reset(); timerNorm.Reset(); timerCopy.Reset(); timerSaxpyV1.Reset(); timerSaxpyV2.Reset(); timerSaxpyV3.Reset();
         timer.Start();
         ConjugateGradients(matrix, x, f, p, r, z, false);
         timer.Pause();
         timerLaplacian.Print("Total Laplacian Time : ");
-        timerSaxpy.Print("Total Saxpy Time : ");
         timerInner.Print("Total InnerProduct Time : ");
+        timerNorm.Print("Total Norm Time : ");
+        timerCopy.Print("Total Copy Time : ");
+        timerSaxpyV1.Print("Total Saxpy Version 1 Time : ");
+        timerSaxpyV2.Print("Total Saxpy Version 2 Time : ");
+        timerSaxpyV3.Print("Total Saxpy Version 3 Time : ");
         timer.Print("Total Conjugate Gradients Time : ");
     }
+    
 
     return 0;
 }
